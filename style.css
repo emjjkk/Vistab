@@ -1,0 +1,49 @@
+/* Custom styles to complement Tailwind */
+body {
+    font-family: 'manrope';
+}
+
+#searchEngineDropdown:hover .group-hover\:block {
+    display: block;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+*::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Live wallpaper animations */
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.live-wallpaper {
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+}
+
+/* Scrollbar styling for modal */
+#wallpaperModal::-webkit-scrollbar {
+    width: 6px;
+}
+
+#wallpaperModal::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#wallpaperModal::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+#wallpaperModal::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
