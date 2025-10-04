@@ -72,6 +72,64 @@ const CONFIG = {
     ]
 };
 
+// IndexedDB setup for wallpaper storage
+let db;
+const DB_NAME = 'spacetabby_db';
+const DB_VERSION = 1;
+const STORE_NAME = 'wallpapers';
+
+function initDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+            db = request.result;
+            resolve(db);
+        };
+        
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME);
+            }
+        };
+    });
+}
+
+function saveWallpaperToDB(data) {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.put(data, 'wallpaper');
+        
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
+
+function getWallpaperFromDB() {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readonly');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.get('wallpaper');
+        
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+function deleteWallpaperFromDB() {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.delete('wallpaper');
+        
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
+
 // State
 let state = {
     currentSearchEngine: 'google',
@@ -83,7 +141,7 @@ let state = {
     currentNoteId: null,
     wallpaper: {
         data: null,
-        type: null, // 'image' or 'video'
+        type: null,
         blur: 0,
         opacity: 0
     }
@@ -107,7 +165,8 @@ const elements = {
 
 // Initialize
 async function init() {
-    loadState();
+    await initDB();
+    await loadState();
     initializeUserName();
     initializeSearch();
     initializeBookmarks();
@@ -117,13 +176,13 @@ async function init() {
     updateGreeting();
     updateDateTime();
     updateWeather();
-    applyWallpaper();
+    await applyWallpaper();
     setInterval(updateDateTime, 1000);
     setInterval(updateWeather, 300000);
 }
 
 // State Management
-function loadState() {
+async function loadState() {
     const savedState = localStorage.getItem('spacetabby_state');
     if (savedState) {
         const parsed = JSON.parse(savedState);
@@ -133,14 +192,45 @@ function loadState() {
         state.theme = parsed.theme || 'light';
         state.todos = parsed.todos || [];
         state.notes = parsed.notes || [];
-        state.wallpaper = parsed.wallpaper || { data: null, type: null, blur: 0, opacity: 0 };
+        
+        // Load wallpaper settings (but not data)
+        if (parsed.wallpaper) {
+            state.wallpaper.type = parsed.wallpaper.type || null;
+            state.wallpaper.blur = parsed.wallpaper.blur || 0;
+            state.wallpaper.opacity = parsed.wallpaper.opacity || 0;
+        }
     } else {
         state.bookmarks = CONFIG.defaultBookmarks;
+    }
+    
+    // Load wallpaper data from IndexedDB
+    try {
+        const wallpaperData = await getWallpaperFromDB();
+        if (wallpaperData) {
+            state.wallpaper.data = wallpaperData;
+        }
+    } catch (error) {
+        console.log('No wallpaper data found');
     }
 }
 
 function saveState() {
-    localStorage.setItem('spacetabby_state', JSON.stringify(state));
+    // Save everything except wallpaper data to localStorage
+    const stateToSave = {
+        userName: state.userName,
+        currentSearchEngine: state.currentSearchEngine,
+        bookmarks: state.bookmarks,
+        theme: state.theme,
+        todos: state.todos,
+        notes: state.notes,
+        wallpaper: {
+            type: state.wallpaper.type,
+            blur: state.wallpaper.blur,
+            opacity: state.wallpaper.opacity
+        }
+    };
+    
+    localStorage.setItem('spacetabby_state', JSON.stringify(stateToSave));
 }
 
 // User Name
@@ -168,9 +258,9 @@ function updateGreeting() {
             greetingElement.className = 'text-center transition-colors duration-300 text-lg max-w-2xl text-neutral-800 dark:text-neutral-200';
         }).catch(() => {
             const fallbackQuotes = [
-                "Worry not that no one knows of you; seek to be worth knowing. - Confucius",
+                "The only way to do great work is to love what you do. - Steve Jobs",
                 "Innovation distinguishes between a leader and a follower. - Steve Jobs",
-                "If your only tool is a hammer, you will see every problem as a nail. - Gambian Proverb"
+                "Stay hungry, stay foolish. - Steve Jobs"
             ];
             const randomQuote = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
             greetingElement.textContent = randomQuote;
@@ -641,11 +731,23 @@ function initializeWallpaper() {
     });
 
     // Apply button
-    applyBtn.addEventListener('click', () => {
+    applyBtn.addEventListener('click', async () => {
         state.wallpaper.blur = parseInt(blurSlider.value);
         state.wallpaper.opacity = parseInt(opacitySlider.value);
+        
+        // Save wallpaper data to IndexedDB if it exists
+        if (state.wallpaper.data) {
+            try {
+                await saveWallpaperToDB(state.wallpaper.data);
+            } catch (error) {
+                console.error('Failed to save wallpaper:', error);
+                alert('Failed to save wallpaper. The file might be too large.');
+                return;
+            }
+        }
+        
         saveState();
-        applyWallpaper();
+        await applyWallpaper();
         elements.wallpaperModal.classList.add('hidden');
     });
 
@@ -655,11 +757,12 @@ function initializeWallpaper() {
     });
 
     // Remove button
-    removeBtn.addEventListener('click', () => {
+    removeBtn.addEventListener('click', async () => {
         if (confirm('Remove wallpaper?')) {
             state.wallpaper = { data: null, type: null, blur: 0, opacity: 0 };
+            await deleteWallpaperFromDB();
             saveState();
-            applyWallpaper();
+            await applyWallpaper();
             elements.wallpaperModal.classList.add('hidden');
         }
     });
@@ -719,7 +822,7 @@ function updateWallpaperPreview() {
     }
 }
 
-function applyWallpaper() {
+async function applyWallpaper() {
     const wallpaperContainer = document.getElementById('wallpaperContainer');
     const wallpaperImage = document.getElementById('wallpaperImage');
     const wallpaperVideo = document.getElementById('wallpaperVideo');
