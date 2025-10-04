@@ -1,6 +1,6 @@
 # Vistab - Pretty, modern new tab extension for chrome with customizable video/image background, bookmarks, and more
 
-<img width="1366" height="647" alt="image" src="https://github.com/user-attachments/assets/b92a63ff-37d4-4041-9e1c-ef97b97f643b" />
+<img width="1366" height="648" alt="image" src="https://github.com/user-attachments/assets/fda539eb-a31c-457a-98cf-c0d379c2225d" />
 
 ## How to use
 
