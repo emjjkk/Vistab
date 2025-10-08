@@ -151,6 +151,8 @@ let state = {
 const elements = {
     greeting: document.getElementById('greeting'),
     topBar: document.getElementById('topBar'),
+    time: document.getElementById('time'),
+    weather: document.getElementById('weather'),
     searchEngineBtn: document.getElementById('searchEngineBtn'),
     searchEngineIcon: document.getElementById('searchEngineIcon'),
     searchEngineDropdown: document.getElementById('searchEngineDropdown'),
@@ -287,7 +289,7 @@ function updateDateTime() {
         minute: '2-digit',
         second: '2-digit'
     };
-    elements.topBar.textContent = now.toLocaleDateString('en-US', options);
+    elements.time.textContent = now.toLocaleDateString('en-US', options);
 }
 
 async function updateWeather() {
@@ -296,17 +298,17 @@ async function updateWeather() {
             navigator.geolocation.getCurrentPosition(async (position) => {
                 const { latitude, longitude } = position.coords;
                 const weather = await fetchWeather(latitude, longitude);
-                const currentText = elements.topBar.textContent;
-                elements.topBar.textContent = `${currentText.split(' - ')[0]} - ${weather}`;
+                const currentText = elements.weather.textContent;
+                elements.weather.textContent = `${currentText.split(' - ')[0]} - ${weather}`;
             }, async () => {
                 const weather = await fetchWeatherByIP();
-                const currentText = elements.topBar.textContent;
-                elements.topBar.textContent = `${currentText.split(' - ')[0]} - ${weather}`;
+                const currentText = elements.weather.textContent;
+                elements.weather.textContent = `${currentText.split(' - ')[0]} - ${weather}`;
             });
         } else {
             const weather = await fetchWeatherByIP();
-            const currentText = elements.topBar.textContent;
-            elements.topBar.textContent = `${currentText.split(' - ')[0]} - ${weather}`;
+            const currentText = elements.weather.textContent;
+            elements.weather.textContent = `${currentText.split(' - ')[0]} - ${weather}`;
         }
     } catch (error) {
         console.log('Weather unavailable');
@@ -314,7 +316,7 @@ async function updateWeather() {
 }
 
 async function fetchWeather(lat, lon) {
-    const API_KEY = 'YOUR_API_KEY';
+    const API_KEY = '9b9dee316f2fdb0dfe18f99d5671f429';
     try {
         const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`);
         const data = await response.json();
