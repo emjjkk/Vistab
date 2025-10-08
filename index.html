@@ -20,7 +20,10 @@
     </div>
 
     <!-- Top Bar - Date, Time, Weather -->
-    <div id="topBar" class="fixed top-4 text-sm text-neutral-800 dark:text-neutral-200 transition-colors duration-300"></div>
+    <div id="topBar" class="fixed flex items-center gap-1 top-4 text-sm text-neutral-800 dark:text-neutral-200 transition-colors duration-300">
+        <div id="time"></div>
+        <div id="weather"></div>
+    </div>
 
     <!-- Main Content -->
     <div class="flex flex-col items-center space-y-5 max-w-2xl w-full px-4">
@@ -184,5 +187,4 @@
 
     <script src="scripts.js"></script>
 </body>
-
 </html>
