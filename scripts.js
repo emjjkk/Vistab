@@ -69,7 +69,8 @@ const CONFIG = {
         { name: "Discord", url: "https://discord.com", icon: "fab fa-discord" },
         { name: "Twitch", url: "https://www.twitch.tv", icon: "fab fa-twitch" },
         { name: "Gmail", url: "https://mail.google.com", icon: "fab fa-google" }
-    ]
+    ],
+    pexelsApiKey: 'hkeIn4kKkW6dLyjjdXovELtLwS80UhK4BawrihgfoYV9O4sHKD7j9Dlk' // User should replace with their own key from pexels.com/api
 };
 
 // IndexedDB setup for wallpaper storage
@@ -81,13 +82,13 @@ const STORE_NAME = 'wallpapers';
 function initDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
-        
+
         request.onerror = () => reject(request.error);
         request.onsuccess = () => {
             db = request.result;
             resolve(db);
         };
-        
+
         request.onupgradeneeded = (event) => {
             const db = event.target.result;
             if (!db.objectStoreNames.contains(STORE_NAME)) {
@@ -102,7 +103,7 @@ function saveWallpaperToDB(data) {
         const transaction = db.transaction([STORE_NAME], 'readwrite');
         const store = transaction.objectStore(STORE_NAME);
         const request = store.put(data, 'wallpaper');
-        
+
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
     });
@@ -113,7 +114,7 @@ function getWallpaperFromDB() {
         const transaction = db.transaction([STORE_NAME], 'readonly');
         const store = transaction.objectStore(STORE_NAME);
         const request = store.get('wallpaper');
-        
+
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
     });
@@ -124,7 +125,7 @@ function deleteWallpaperFromDB() {
         const transaction = db.transaction([STORE_NAME], 'readwrite');
         const store = transaction.objectStore(STORE_NAME);
         const request = store.delete('wallpaper');
-        
+
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
     });
@@ -142,9 +143,11 @@ let state = {
     wallpaper: {
         data: null,
         type: null,
+        url: null,
         blur: 0,
         opacity: 0
-    }
+    },
+    wallpaperTab: 'upload'
 };
 
 // DOM Elements
@@ -194,17 +197,18 @@ async function loadState() {
         state.theme = parsed.theme || 'light';
         state.todos = parsed.todos || [];
         state.notes = parsed.notes || [];
-        
+
         // Load wallpaper settings (but not data)
         if (parsed.wallpaper) {
             state.wallpaper.type = parsed.wallpaper.type || null;
+            state.wallpaper.url = parsed.wallpaper.url || null;
             state.wallpaper.blur = parsed.wallpaper.blur || 0;
             state.wallpaper.opacity = parsed.wallpaper.opacity || 0;
         }
     } else {
         state.bookmarks = CONFIG.defaultBookmarks;
     }
-    
+
     // Load wallpaper data from IndexedDB
     try {
         const wallpaperData = await getWallpaperFromDB();
@@ -227,11 +231,12 @@ function saveState() {
         notes: state.notes,
         wallpaper: {
             type: state.wallpaper.type,
+            url: state.wallpaper.url,
             blur: state.wallpaper.blur,
             opacity: state.wallpaper.opacity
         }
     };
-    
+
     localStorage.setItem('spacetabby_state', JSON.stringify(stateToSave));
 }
 
@@ -445,11 +450,12 @@ function renderBookmarks() {
     state.bookmarks.forEach((bookmark, index) => {
         const bookmarkElement = document.createElement('div');
         bookmarkElement.className = 'relative group';
+        var bmicon = bookmark.icon || 'fa-solid fa-earth'
 
         const link = document.createElement('a');
         link.href = bookmark.url;
         link.className = 'w-8 h-8 flex items-center justify-center rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors';
-        link.innerHTML = `<i class="${bookmark.icon} text-sm"></i>`;
+        link.innerHTML = `<i class="${bmicon} text-sm"></i>`;
 
         const tooltip = document.createElement('span');
         tooltip.className = 'absolute bottom-full mb-2 hidden group-hover:block bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-800 text-xs px-2 py-1 rounded whitespace-nowrap transition-colors';
@@ -504,7 +510,7 @@ function saveNewBookmark() {
     const url = document.getElementById('bookmarkUrl').value.trim();
     const icon = document.getElementById('bookmarkIcon').value.trim();
 
-    if (name && url && icon) {
+    if (name && url) {
         state.bookmarks.push({ name, url, icon });
         saveState();
         renderBookmarks();
@@ -717,8 +723,18 @@ function initializeWallpaper() {
     const cancelBtn = document.getElementById('cancelWallpaper');
     const removeBtn = document.getElementById('removeWallpaper');
 
+    // Tab switching
+    document.getElementById('uploadTab').addEventListener('click', () => switchWallpaperTab('upload'));
+    document.getElementById('pexelsTab').addEventListener('click', () => switchWallpaperTab('pexels'));
+
     // File upload handler
     wallpaperUpload.addEventListener('change', handleWallpaperUpload);
+
+    // Pexels search
+    document.getElementById('pexelsSearchBtn').addEventListener('click', searchPexels);
+    document.getElementById('pexelsSearchInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') searchPexels();
+    });
 
     // Blur slider
     blurSlider.addEventListener('input', (e) => {
@@ -736,7 +752,7 @@ function initializeWallpaper() {
     applyBtn.addEventListener('click', async () => {
         state.wallpaper.blur = parseInt(blurSlider.value);
         state.wallpaper.opacity = parseInt(opacitySlider.value);
-        
+
         // Save wallpaper data to IndexedDB if it exists
         if (state.wallpaper.data) {
             try {
@@ -747,7 +763,7 @@ function initializeWallpaper() {
                 return;
             }
         }
-        
+
         saveState();
         await applyWallpaper();
         elements.wallpaperModal.classList.add('hidden');
@@ -761,26 +777,147 @@ function initializeWallpaper() {
     // Remove button
     removeBtn.addEventListener('click', async () => {
         if (confirm('Remove wallpaper?')) {
-            state.wallpaper = { data: null, type: null, blur: 0, opacity: 0 };
+            state.wallpaper = { data: null, type: null, url: null, blur: 0, opacity: 0 };
             await deleteWallpaperFromDB();
             saveState();
             await applyWallpaper();
             elements.wallpaperModal.classList.add('hidden');
         }
     });
+
+    // Load initial Pexels results
+    loadPexelsCurated();
+}
+
+function switchWallpaperTab(tab) {
+    state.wallpaperTab = tab;
+
+    // Update tab buttons
+    document.getElementById('uploadTab').className = tab === 'upload'
+        ? 'px-4 py-2 bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-800 rounded-t transition-colors'
+        : 'px-4 py-2 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded transition-colors';
+
+    document.getElementById('pexelsTab').className = tab === 'pexels'
+        ? 'px-4 py-2 bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-800 rounded-t transition-colors'
+        : 'px-4 py-2 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded transition-colors';
+
+    // Show/hide tab content
+    document.getElementById('uploadContent').style.display = tab === 'upload' ? 'block' : 'none';
+    document.getElementById('pexelsContent').style.display = tab === 'pexels' ? 'block' : 'none';
+}
+
+async function loadPexelsCurated() {
+    const resultsContainer = document.getElementById('pexelsResults');
+    resultsContainer.innerHTML = '<p class="text-neutral-500 dark:text-neutral-400 text-center py-4">Loading curated photos...</p>';
+
+    try {
+        const response = await fetch('https://api.pexels.com/v1/curated?per_page=12', {
+            headers: {
+                'Authorization': CONFIG.pexelsApiKey
+            }
+        });
+
+        const data = await response.json();
+        renderPexelsResults(data.photos);
+    } catch (error) {
+        resultsContainer.innerHTML = '<p class="text-red-500 text-center py-4">Failed to load images. Check your API key.</p>';
+    }
+}
+
+async function searchPexels() {
+    const query = document.getElementById('pexelsSearchInput').value.trim();
+    if (!query) return;
+
+    const resultsContainer = document.getElementById('pexelsResults');
+    resultsContainer.innerHTML = '<p class="text-neutral-500 dark:text-neutral-400 text-center py-4">Searching...</p>';
+
+    try {
+        const response = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=12`, {
+            headers: {
+                'Authorization': CONFIG.pexelsApiKey
+            }
+        });
+
+        const data = await response.json();
+        renderPexelsResults(data.photos);
+    } catch (error) {
+        resultsContainer.innerHTML = '<p class="text-red-500 text-center py-4">Search failed. Please try again.</p>';
+    }
+}
+
+function renderPexelsResults(photos) {
+    const resultsContainer = document.getElementById('pexelsResults');
+
+    if (!photos || photos.length === 0) {
+        resultsContainer.innerHTML = '<p class="text-neutral-500 dark:text-neutral-400 text-center py-4">No results found.</p>';
+        return;
+    }
+
+    resultsContainer.innerHTML = '';
+
+    photos.forEach(photo => {
+        const item = document.createElement('div');
+        item.className = 'relative group cursor-pointer overflow-hidden rounded flex-shrink-0';
+
+        const imgContainer = document.createElement('div');
+        imgContainer.className = 'h-[160px] overflow-hidden';
+
+        const img = document.createElement('img');
+        img.src = photo.src.medium;
+        // Use object-contain to show entire image without cropping
+        img.className = 'h-full w-auto object-contain transition-transform group-hover:scale-110';
+
+        const overlay = document.createElement('div');
+        overlay.className = 'absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center';
+        overlay.innerHTML = '<i class="fas fa-check text-white text-2xl"></i>';
+
+        imgContainer.appendChild(img);
+        item.appendChild(imgContainer);
+        item.appendChild(overlay);
+
+        item.addEventListener('click', () => applyPexelsImage(photo.src.large2x, 'image'));
+
+        resultsContainer.appendChild(item);
+    });
+}
+
+async function applyPexelsImage(url, type) {
+    try {
+        // Convert URL to data URL for storage
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            state.wallpaper.data = e.target.result;
+            state.wallpaper.type = type;
+            state.wallpaper.url = url;
+
+            updateWallpaperPreview();
+            document.getElementById('wallpaperPreview').classList.remove('hidden');
+        };
+
+        reader.readAsDataURL(blob);
+    } catch (error) {
+        console.error('Failed to load image:', error);
+        alert('Failed to load image. Please try another one.');
+    }
 }
 
 function openWallpaperModal() {
     elements.wallpaperModal.classList.remove('hidden');
-    
+
     // Set current values
     document.getElementById('blurSlider').value = state.wallpaper.blur;
     document.getElementById('opacitySlider').value = state.wallpaper.opacity;
     document.getElementById('blurValue').textContent = state.wallpaper.blur;
     document.getElementById('opacityValue').textContent = state.wallpaper.opacity;
 
+    // Switch to appropriate tab
+    switchWallpaperTab(state.wallpaperTab);
+
     // Show preview if wallpaper exists
-    if (state.wallpaper.data) {
+    if (state.wallpaper.data || state.wallpaper.url) {
         updateWallpaperPreview();
         document.getElementById('wallpaperPreview').classList.remove('hidden');
     } else {
@@ -793,12 +930,13 @@ function handleWallpaperUpload(e) {
     if (!file) return;
 
     const reader = new FileReader();
-    
+
     reader.onload = (event) => {
         const fileType = file.type.startsWith('image/') ? 'image' : 'video';
         state.wallpaper.data = event.target.result;
         state.wallpaper.type = fileType;
-        
+        state.wallpaper.url = null;
+
         updateWallpaperPreview();
         document.getElementById('wallpaperPreview').classList.remove('hidden');
     };
@@ -810,14 +948,16 @@ function updateWallpaperPreview() {
     const previewImage = document.getElementById('previewImage');
     const previewVideo = document.getElementById('previewVideo');
     const blur = document.getElementById('blurSlider').value;
-    
+
+    const source = state.wallpaper.data || state.wallpaper.url;
+
     if (state.wallpaper.type === 'image') {
-        previewImage.src = state.wallpaper.data;
+        previewImage.src = source;
         previewImage.style.filter = `blur(${blur}px)`;
         previewImage.classList.remove('hidden');
         previewVideo.classList.add('hidden');
     } else if (state.wallpaper.type === 'video') {
-        previewVideo.src = state.wallpaper.data;
+        previewVideo.src = source;
         previewVideo.style.filter = `blur(${blur}px)`;
         previewVideo.classList.remove('hidden');
         previewImage.classList.add('hidden');
@@ -830,21 +970,23 @@ async function applyWallpaper() {
     const wallpaperVideo = document.getElementById('wallpaperVideo');
     const wallpaperOverlay = document.getElementById('wallpaperOverlay');
 
-    if (state.wallpaper.data) {
+    const source = state.wallpaper.data || state.wallpaper.url;
+
+    if (source) {
         wallpaperContainer.classList.remove('hidden');
-        
+
         if (state.wallpaper.type === 'image') {
-            wallpaperImage.src = state.wallpaper.data;
+            wallpaperImage.src = source;
             wallpaperImage.style.filter = `blur(${state.wallpaper.blur}px)`;
             wallpaperImage.classList.remove('hidden');
             wallpaperVideo.classList.add('hidden');
         } else if (state.wallpaper.type === 'video') {
-            wallpaperVideo.src = state.wallpaper.data;
+            wallpaperVideo.src = source;
             wallpaperVideo.style.filter = `blur(${state.wallpaper.blur}px)`;
             wallpaperVideo.classList.remove('hidden');
             wallpaperImage.classList.add('hidden');
         }
-        
+
         wallpaperOverlay.style.opacity = state.wallpaper.opacity / 100;
     } else {
         wallpaperContainer.classList.add('hidden');
