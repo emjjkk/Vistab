@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +12,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="min-h-screen bg-white dark:bg-neutral-900 flex flex-col items-center justify-center transition-colors duration-300">
+
+<body
+    class="min-h-screen bg-white dark:bg-neutral-900 flex flex-col items-center justify-center transition-colors duration-300">
     <!-- Wallpaper Container -->
     <div id="wallpaperContainer" class="fixed inset-0 -z-10 hidden">
         <img id="wallpaperImage" class="w-full h-full object-cover hidden" alt="Wallpaper">
@@ -20,7 +23,8 @@
     </div>
 
     <!-- Top Bar - Date, Time, Weather -->
-    <div id="topBar" class="fixed flex items-center gap-1 top-4 text-sm text-neutral-800 dark:text-neutral-200 transition-colors duration-300">
+    <div id="topBar"
+        class="fixed flex items-center gap-1 top-4 text-sm text-neutral-800 dark:text-neutral-200 transition-colors duration-300">
         <div id="time"></div>
         <div id="weather"></div>
     </div>
@@ -28,34 +32,36 @@
     <!-- Main Content -->
     <div class="flex flex-col items-center space-y-5 max-w-2xl w-full px-4">
         <!-- Greeting/Quote -->
-        <div id="greeting" class="text-center text-neutral-800 dark:text-neutral-200 transition-colors duration-300 min-h-[3rem]"></div>
+        <div id="greeting"
+            class="text-center text-neutral-800 dark:text-neutral-200 transition-colors duration-300 min-h-[3rem]">
+        </div>
 
         <!-- Search Box -->
         <div class="relative w-full max-w-xl mb-5">
-            <div class="flex items-center border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 rounded-lg px-3 py-2 transition-colors duration-300">
+            <div
+                class="flex items-center border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 rounded-lg px-3 py-2 transition-colors duration-300">
                 <!-- Search Engine Dropdown -->
                 <div class="relative group">
-                    <button id="searchEngineBtn" class="flex items-center space-x-2 px-2 py-1 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors">
+                    <button id="searchEngineBtn"
+                        class="flex items-center space-x-2 px-2 py-1 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors">
                         <i id="searchEngineIcon" class="fab fa-google text-sm"></i>
                         <span></span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
-                    <div id="searchEngineDropdown" class="absolute left-0 mt-1 w-48 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-lg shadow-lg z-10 hidden group-hover:block transition-colors">
+                    <div id="searchEngineDropdown"
+                        class="absolute left-0 mt-1 w-48 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-lg shadow-lg z-10 hidden group-hover:block transition-colors">
                         <div class="py-1"></div>
                     </div>
                 </div>
 
                 <!-- Search Input -->
-                <input 
-                    id="searchInput" 
-                    type="text" 
-                    class="flex-1 bg-transparent outline-none px-3 py-1 text-neutral-800 dark:text-neutral-200 placeholder-neutral-500 dark:placeholder-neutral-400 transition-colors duration-300" 
-                    placeholder="Search..."
-                    autofocus
-                >
-                
+                <input id="searchInput" type="text"
+                    class="flex-1 bg-transparent outline-none px-3 py-1 text-neutral-800 dark:text-neutral-200 placeholder-neutral-500 dark:placeholder-neutral-400 transition-colors duration-300"
+                    placeholder="Search..." autofocus>
+
                 <!-- Search Button -->
-                <button id="searchBtn" class="p-1 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors">
+                <button id="searchBtn"
+                    class="p-1 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors">
                     <i class="fas fa-arrow-right text-sm"></i>
                 </button>
             </div>
@@ -63,23 +69,25 @@
     </div>
 
     <!-- Bookmarks -->
-    <div id="bookmarks" class="fixed bottom-4 flex items-center space-x-1 text-neutral-800 dark:text-neutral-200 transition-colors duration-300"></div>
-
-    <!-- Theme Toggle Button -->
-    <button id="themeToggle" class="hidden fixed bottom-4 right-4 p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors">
-        <i id="themeIcon" class="fas fa-moon text-sm"></i>
-    </button>
+    <div id="bookmarks"
+        class="fixed bottom-4 flex items-center space-x-1 text-neutral-800 dark:text-neutral-200 transition-colors duration-300">
+    </div>
 
     <!-- Add Bookmark Modal -->
     <div id="addBookmarkModal" class="fixed inset-0 bg-black/20 flex items-center justify-center hidden z-20">
         <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 w-80 transition-colors">
             <h3 class="text-lg font-medium mb-4 text-neutral-800 dark:text-neutral-200">Add Bookmark</h3>
-            <input type="text" id="bookmarkName" placeholder="Name" class="w-full border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded px-3 py-2 mb-3 transition-colors placeholder-neutral-500 dark:placeholder-neutral-400">
-            <input type="url" id="bookmarkUrl" placeholder="URL" class="w-full border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded px-3 py-2 mb-3 transition-colors placeholder-neutral-500 dark:placeholder-neutral-400">
-            <input type="text" id="bookmarkIcon" placeholder="FontAwesome icon class (e.g., fas fa-star)" class="w-full border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded px-3 py-2 mb-4 transition-colors placeholder-neutral-500 dark:placeholder-neutral-400">
+            <input type="text" id="bookmarkName" placeholder="Name"
+                class="w-full border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded px-3 py-2 mb-3 transition-colors placeholder-neutral-500 dark:placeholder-neutral-400">
+            <input type="url" id="bookmarkUrl" placeholder="URL"
+                class="w-full border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded px-3 py-2 mb-3 transition-colors placeholder-neutral-500 dark:placeholder-neutral-400">
+            <input type="text" id="bookmarkIcon" placeholder="FontAwesome icon class (e.g., fas fa-star)"
+                class="w-full border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded px-3 py-2 mb-4 transition-colors placeholder-neutral-500 dark:placeholder-neutral-400">
             <div class="flex justify-end space-x-2">
-                <button id="cancelBookmark" class="px-4 py-2 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors">Cancel</button>
-                <button id="saveBookmark" class="px-4 py-2 bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-800 rounded hover:bg-neutral-700 dark:hover:bg-neutral-300 transition-colors">Save</button>
+                <button id="cancelBookmark"
+                    class="px-4 py-2 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors">Cancel</button>
+                <button id="saveBookmark"
+                    class="px-4 py-2 bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-800 rounded hover:bg-neutral-700 dark:hover:bg-neutral-300 transition-colors">Save</button>
             </div>
         </div>
     </div>
@@ -89,14 +97,17 @@
         <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 w-96 max-h-[80vh] flex flex-col transition-colors">
             <h3 class="text-lg font-medium mb-4 text-neutral-800 dark:text-neutral-200">Todo List</h3>
             <div class="flex mb-4 space-x-2">
-                <input type="text" id="todoInput" placeholder="Add a new task..." class="flex-1 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded px-3 py-2 transition-colors placeholder-neutral-500 dark:placeholder-neutral-400">
-                <button id="addTodoBtn" class="px-4 py-2 bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-800 rounded hover:bg-neutral-700 dark:hover:bg-neutral-300 transition-colors">
+                <input type="text" id="todoInput" placeholder="Add a new task..."
+                    class="flex-1 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded px-3 py-2 transition-colors placeholder-neutral-500 dark:placeholder-neutral-400">
+                <button id="addTodoBtn"
+                    class="px-4 py-2 bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-800 rounded hover:bg-neutral-700 dark:hover:bg-neutral-300 transition-colors">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
             <div id="todoList" class="flex-1 overflow-y-auto space-y-2 mb-4"></div>
             <div class="flex justify-end">
-                <button id="closeTodoModal" class="px-4 py-2 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors">Close</button>
+                <button id="closeTodoModal"
+                    class="px-4 py-2 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors">Close</button>
             </div>
         </div>
     </div>
@@ -105,10 +116,11 @@
     <div id="notepadModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-20">
         <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 w-[600px] max-h-[80vh] flex flex-col transition-colors">
             <h3 class="text-lg font-medium mb-4 text-neutral-800 dark:text-neutral-200">Notepad</h3>
-            
+
             <!-- Notes List View -->
             <div id="notesListView" style="display: flex;" class="flex-1 flex-col">
-                <button id="createNoteBtn" class="w-full mb-4 px-4 py-2 bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-800 rounded hover:bg-neutral-700 dark:hover:bg-neutral-300 transition-colors">
+                <button id="createNoteBtn"
+                    class="w-full mb-4 px-4 py-2 bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-800 rounded hover:bg-neutral-700 dark:hover:bg-neutral-300 transition-colors">
                     <i class="fas fa-plus mr-2"></i>New Note
                 </button>
                 <div id="notesList" class="flex-1 overflow-y-auto space-y-2"></div>
@@ -116,70 +128,129 @@
 
             <!-- Note Editor View -->
             <div id="noteEditorView" style="display: none;" class="flex-1 flex-col">
-                <input type="text" id="noteTitle" placeholder="Note title..." class="w-full mb-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded px-3 py-2 transition-colors placeholder-neutral-500 dark:placeholder-neutral-400">
-                <textarea id="noteContent" placeholder="Start typing..." class="flex-1 w-full border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded px-3 py-2 transition-colors placeholder-neutral-500 dark:placeholder-neutral-400 resize-none" rows="10"></textarea>
+                <input type="text" id="noteTitle" placeholder="Note title..."
+                    class="w-full mb-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded px-3 py-2 transition-colors placeholder-neutral-500 dark:placeholder-neutral-400">
+                <textarea id="noteContent" placeholder="Start typing..."
+                    class="flex-1 w-full border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded px-3 py-2 transition-colors placeholder-neutral-500 dark:placeholder-neutral-400 resize-none"
+                    rows="10"></textarea>
                 <div class="flex justify-between mt-4">
-                    <button id="backToListBtn" class="px-4 py-2 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors">
+                    <button id="backToListBtn"
+                        class="px-4 py-2 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors">
                         <i class="fas fa-arrow-left mr-2"></i>Back
                     </button>
                     <div class="space-x-2">
-                        <button id="deleteNoteBtn" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">Delete</button>
-                        <button id="saveNoteBtn" class="px-4 py-2 bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-800 rounded hover:bg-neutral-700 dark:hover:bg-neutral-300 transition-colors">Save</button>
+                        <button id="deleteNoteBtn"
+                            class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">Delete</button>
+                        <button id="saveNoteBtn"
+                            class="px-4 py-2 bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-800 rounded hover:bg-neutral-700 dark:hover:bg-neutral-300 transition-colors">Save</button>
                     </div>
                 </div>
             </div>
 
             <div class="flex justify-end mt-4">
-                <button id="closeNotepadModal" class="px-4 py-2 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors">Close</button>
+                <button id="closeNotepadModal"
+                    class="px-4 py-2 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors">Close</button>
             </div>
         </div>
     </div>
 
     <!-- Wallpaper Modal -->
-    <div id="wallpaperModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-20">
-        <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 w-[500px] transition-colors">
-            <h3 class="text-lg font-medium mb-4 text-neutral-800 dark:text-neutral-200">Wallpaper Settings</h3>
-            
-            <!-- Upload Section -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium mb-2 text-neutral-800 dark:text-neutral-200">Upload Wallpaper</label>
-                <input type="file" id="wallpaperUpload" accept="image/*,video/*" class="w-full border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded px-3 py-2 transition-colors text-sm">
-                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Supports images and videos</p>
-            </div>
+    <div id="wallpaperModal"
+        class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-20 overflow-y-auto">
+        <div
+            class="bg-white dark:bg-neutral-800 rounded-lg p-6 w-[1000px] max-h-[90vh] overflow-y-auto transition-colors my-8">
+            <div class="flex gap-12">
+                <div class="w-3/5">
+                    <h3 class="text-lg font-medium mb-4 text-neutral-800 dark:text-neutral-200">Wallpaper Settings</h3>
+                    <!-- Tabs -->
+                    <div class="flex space-x-2 mb-4 border-neutral-300 dark:border-neutral-600">
+                        <button id="uploadTab"
+                            class="px-4 py-2 bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-800 rounded transition-colors">
+                            <i class="fas fa-upload mr-2"></i>Upload
+                        </button>
+                        <button id="pexelsTab"
+                            class="px-4 py-2 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded transition-colors">
+                            <i class="fas fa-images mr-2"></i>Select from Pexels
+                        </button>
+                    </div>
 
-            <!-- Current Wallpaper Preview -->
-            <div id="wallpaperPreview" class="mb-4 hidden">
-                <label class="block text-sm font-medium mb-2 text-neutral-800 dark:text-neutral-200">Current Wallpaper</label>
-                <div class="relative w-full h-32 border border-neutral-300 dark:border-neutral-600 rounded overflow-hidden">
-                    <img id="previewImage" class="w-full h-full object-cover hidden" alt="Preview">
-                    <video id="previewVideo" class="w-full h-full object-cover hidden" autoplay loop muted playsinline></video>
+                    <!-- Tab Contents -->
+                    <div class="mb-6">
+                        <!-- Upload Tab Content -->
+                        <div id="uploadContent" style="display: block;">
+                            <div class="mb-4">
+                                <label
+                                    class="block text-sm font-medium mb-2 text-neutral-800 dark:text-neutral-200">Upload
+                                    Wallpaper</label>
+                                <input type="file" id="wallpaperUpload" accept="image/*,video/*"
+                                    class="w-full border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded px-3 py-2 transition-colors text-sm">
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Supports images, GIFs, and videos <br/> Files stored locally; videos may affect performance on low-end devices.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Pexels Tab Content -->
+                        <div id="pexelsContent" style="display: none;">
+                            <div class="mb-2">
+                                <div class="flex space-x-2">
+                                    <input type="text" id="pexelsSearchInput" placeholder="Search Pexels..."
+                                        class="flex-1 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded px-3 py-2 transition-colors placeholder-neutral-500 dark:placeholder-neutral-400">
+                                    <button id="pexelsSearchBtn"
+                                        class="px-4 py-2 bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-800 rounded hover:bg-neutral-700 dark:hover:bg-neutral-300 transition-colors">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-3">Click any image to apply
+                                    it
+                                    as wallpaper</p>
+                            </div>
+                            <div id="pexelsResults" class="flex overflow-x-auto space-x-3">
+                                <!-- Results will be populated here -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+                <div class="w-2/5">
+                    <!-- Current Wallpaper Preview (constant across all tabs) -->
+                    <div id="wallpaperPreview" class="mb-4 hidden">
+                        <label class="block text-sm font-medium mb-2 text-neutral-800 dark:text-neutral-200">Current
+                            Wallpaper</label>
+                        <div
+                            class="relative w-full h-32 border border-neutral-300 dark:border-neutral-600 rounded overflow-hidden">
+                            <img id="previewImage" class="w-full h-full object-cover hidden" alt="Preview">
+                            <video id="previewVideo" class="w-full h-full object-cover hidden" autoplay loop muted
+                                playsinline></video>
+                        </div>
+                    </div>
+                    <!-- Blur Control (constant across all tabs) -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2 text-neutral-800 dark:text-neutral-200">
+                            Blur: <span id="blurValue">0</span>px
+                        </label>
+                        <input type="range" id="blurSlider" min="0" max="20" value="0" step="1" class="w-full">
+                    </div>
 
-            <!-- Blur Control -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium mb-2 text-neutral-800 dark:text-neutral-200">
-                    Blur: <span id="blurValue">0</span>px
-                </label>
-                <input type="range" id="blurSlider" min="0" max="20" value="0" step="1" class="w-full">
-            </div>
+                    <!-- Opacity Control (constant across all tabs) -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2 text-neutral-800 dark:text-neutral-200">
+                            Overlay Opacity: <span id="opacityValue">0</span>%
+                        </label>
+                        <input type="range" id="opacitySlider" min="0" max="100" value="0" step="5" class="w-full">
+                    </div>
 
-            <!-- Opacity Control --> 
-            <div class="mb-4">
-                <label class="block text-sm font-medium mb-2 text-neutral-800 dark:text-neutral-200">
-                    Overlay Opacity: <span id="opacityValue">0</span>%
-                </label>
-                <input type="range" id="opacitySlider" min="0" max="100" value="0" step="5" class="w-full">
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex justify-between space-x-2">
-                <button id="removeWallpaper" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
-                    Remove Wallpaper
-                </button>
-                <div class="space-x-2">
-                    <button id="cancelWallpaper" class="px-4 py-2 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors">Cancel</button>
-                    <button id="applyWallpaper" class="px-4 py-2 bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-800 rounded hover:bg-neutral-700 dark:hover:bg-neutral-300 transition-colors">Apply</button>
+                    <!-- Action Buttons -->
+                    <div class="flex justify-between space-x-2">
+                        <button id="removeWallpaper"
+                            class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+                            Remove Wallpaper
+                        </button>
+                        <div class="space-x-2">
+                            <button id="cancelWallpaper"
+                                class="px-4 py-2 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors">Cancel</button>
+                            <button id="applyWallpaper"
+                                class="px-4 py-2 bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-800 rounded hover:bg-neutral-700 dark:hover:bg-neutral-300 transition-colors">Apply</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -187,4 +258,5 @@
 
     <script src="scripts.js"></script>
 </body>
+
 </html>
